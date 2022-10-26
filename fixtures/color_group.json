@@ -1,0 +1,23 @@
+[
+{
+    "model": "breakthrough.color_group",
+    "pk": 1,
+    "fields": {
+        "title": "Yellow"
+    }
+},
+{
+    "model": "breakthrough.color_group",
+    "pk": 2,
+    "fields": {
+        "title": "Green"
+    }
+},
+{
+    "model": "breakthrough.color_group",
+    "pk": 3,
+    "fields": {
+        "title": "Blue"
+    }
+}
+]

@@ -1,0 +1,728 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load filters %}
+
+{% block contents %}
+
+
+
+<div class="flex justify-between">
+    <p class="pl-10 mt-5 text-xl"> Members </p>
+    <!-- filter buttons --> 
+</div>
+<div class="pl-10 flex w-full my-2  space-x-2" x-init="fetchMembers();">
+
+    <!-- search signal input field-->
+    <div class="flex rounded-sm bg-gray-100 border border-gray-300 hover:bg-gray-200 text-xs">
+        <input  
+            x-ref="searchMember"
+            x-model="search"
+            x-on:keydown.window.prevent.slash="$refs.searchMember.focus()"
+            placeholder="Search members"
+            type="text"
+            class="bg-transparent border-0 text-xs py-0 px-2 outline-none border-transparent focus:border-transparent focus:ring-0" 
+            />
+        <div class="pt-1 px-2">
+            <div x-show="search.length == 0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div x-show="search.length > 0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hover:bg-gray-300" viewBox="0 0 20 20" fill="currentColor" @click="search=''">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="flex h-full overflow-hidden">
+    <div class="flex-1 h-full overflow-y-auto pl-10">
+        <div class="flex justify-between">
+            <p class="my-3 font-semibold text-sm"> Members </p>
+            <p class="my-3 p-1 px-3 rounded-sm text-sm text-white bg-emerald-700 hover:bg-emerald-900">Create Event + </p>
+        </div>
+        <ul class="divide-y border text-sm">
+            <template x-for="(member, index) in filteredMembers" :key="index">
+                <li 
+                    class="p-1 flex hover:bg-gray-100 pr-10 space-x-3"  
+                    :class="{'bg-emerald-100':activeMember === index}"
+                    :id="member.id">
+
+                    <span class="text-emerald-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <p class="" x-text="member.id"></p>
+                    <p 
+                        class="line-clamp-1 px-2 flex-1 hover:cursor-e-resize" 
+                        @click="sidebarOpen = true, activeMember = index, setEvent(event)"
+                        x-text="member.full_name"></p>
+                    <p class="line-clamp-1 w-48" x-text="member.color"></p>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-200 hover:text-slate-500 hover:cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" @click="discardEvent(event,index)">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </li>
+            </template>
+        </ul>
+        <p class="p-5"> Create Event + </p>
+    </div>
+
+
+    <div class="flex-shrink-0 w-[850px] h-full flex flex-col overflow-y-hidden px-5 ml-5 transition-all duration-500" :class="{ '-mr-[850px]': !sidebarOpen }">
+
+        <div class="py-2 flex justify-between" :class="{ 'border-b-2' : !sideScrolled }">
+            <div></div>
+            <div class="flex space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hover:bg-gray-100" viewBox="0 0 20 20" fill="currentColor" @click="sidebarOpen = false">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <div x-show="showMember">
+            
+            <div class="h-full overflow-y-auto" @scroll="sideScrolled = ($el.scrollTop > 5 ? false : true), console.log(sideScrolled)">
+                
+                <p class="text-2xl font-semibold" x-text="cur_event.title"></p>
+                <div class="flex space-x-3">
+                    <p class="text-xs text-gray-400" x-text="cur_event.location"></p>
+                    <p class="text-xs text-gray-400" x-text="cur_event.sectors"></p>
+                </div>
+                <div class="flex space-x-2 my-5 text-sm">
+                    <button class="bg-gray-100 p-1 rounded-sm hover:bg-gray-300" @click="$refs.attachment.click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                    </button>
+                    <button class="bg-gray-100 p-1 rounded-sm hover:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+
+                </div>
+
+                
+
+                <input type="file" x-ref="attachment" class="hidden" name="attachment" id="attachment" @change="uploadFile()">
+
+                <p class="text-sm font-semibold mt-5 mb-3 ">Description:</p>
+                <p class="text-xs line-clamp-3" x-text="cur_event.description"></p>
+
+                <p class="text-sm font-semibold mt-5 mb-3">Activities</p>
+                <div class="flex space-x-2 text-xs">
+                    <p class="py-1">Show : </p>
+                    <button class="bg-gray-100 p-0 rounded-sm hover:bg-gray-300 px-3" :class="{ 'bg-gray-300': showAll }" @click="hideAllActivities(); showAll = true;">All</button>
+                    <button class="bg-gray-100 p-0 rounded-sm hover:bg-gray-300 px-3" :class="{ 'bg-gray-300': showAttachments }" @click="hideAllActivities(); showAttachments = true;">Attachments</button>
+                    <button class="bg-gray-100 p-0 rounded-sm hover:bg-gray-300 px-3" :class="{ 'bg-gray-300': showNotes }" @click="hideAllActivities();showNotes = true;">Notes</button>
+                    <button class="bg-gray-100 p-0 rounded-sm hover:bg-gray-300 px-3" :class="{ 'bg-gray-300': showData }" @click="hideAllActivities();showData=true;">Data</button>
+                    <button class="bg-gray-100 p-0 rounded-sm hover:bg-gray-300 px-3" :class="{ 'bg-gray-300': showColabs }" @click="hideAllActivities();showColabs=true;">Collaborators</button>
+                </div>
+
+
+                <div x-show="showAttachments|showAll ">
+                    <p class="text-sm font-semibold mt-5 mb-3">Attachments</p>
+                    <div class="">
+                        <template x-for="(f, index) in memberFiles" :key="index">
+                            <div class="flex justify-between py-1 text-xs border-b">
+                                <div class="flex space-x-2">
+                                    <i class="text-md" :class="f.css_icon"></i>
+                                    <p class="" x-text="f.file_name"></p>
+                                </div>
+                                <div class="flex space-x-2">
+
+                                    <p class="" x-text="f.created_on"></p>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 hover:text-red-900" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <a :href="f.url" download>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 hover:text-emerald-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /> 
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </template>
+                        <svg x-show="file_uploading" role="status" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-emerald-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                        </svg>
+                    </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+        <div x-show="showLoanApplication">
+            <div class="flex flex-wrap -mx-3 mb-6 border-b">
+                <div class="w-48 px-3 mb-6 md:mb-0">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-first-name">
+                    Loan Amount
+                    </label>
+                    <input 
+                        class="w-full bg-gray-200 text-gray-700 border rounded py-1 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" 
+                        id="grid-first-name" 
+                        type="number"  
+                        min="300000" max="" 
+                        placeholder="Max Amount"
+                        value="300000"
+                        x-model.number="new_loan.amount">
+                </div>
+                <div class="px-3">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-last-name">
+                    Loan Period
+                    </label>
+                    <select 
+                        class="border border-gray-400 hover:border-gray-500 px-4 py-1 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                        x-model="new_loan.rate">
+                        <template x-for="k,v in loan_rate" :key="k">
+                            <option :value="v" x-text="k"></option>
+                        </template>
+                      </select>
+                    </div>
+            </div>
+
+            <div class="w-1/2">
+                <div class="grid grid-cols-2 text-sm">
+                    <p > Loan Insurance </p> 
+                    <p  x-text="new_loan.insurance" 
+                        x-effect="new_loan.insurance = new_loan.amount * 2 / 100"
+                        class="oldstyle-nums proportional-nums slashed-zero text-right" ></p>
+
+                    <p > Transfer fee </p> 
+                    <p class="text-right"> 2500 </p>
+
+                    <p> Interest Rate </p>
+                    <p  x-text="new_loan.rate"
+                        class="text-right"></p>
+
+                    <p > Loan Interest </p> 
+                    <p  x-text="new_loan.interest" 
+                        x-effect="new_loan.interest = new_loan.amount * new_loan.rate / 100"
+                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+                    
+                    <p > Disbursed Amount </p> 
+                    <p  x-text="new_loan.payout" 
+                        x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - 2500"
+                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+
+                    <p > Total Repayment </p> 
+                    <p  x-text="new_loan.value" 
+                        x-effect="new_loan.value = new_loan.amount - new_loan.insurance - 2500 + new_loan.interest"
+                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+
+                    <p > Monthly Repayment </p> 
+                    <p  x-text="new_loan.repayment" 
+                        x-effect="new_loan.repayment = new_loan.value / loan_rate[new_loan.rate]"
+                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+
+                </div>
+
+
+                <button 
+                    class="rounded bg-gray-100 hover:bg-emerald-900 hover:text-white p-1 px-3 my-3"
+                    @click="printDiv('LoanApplicationForm')"> Print Loan Application </button>
+
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+  <!--Overlay-->
+<div class="overflow-auto" style="background-color: rgba(0,0,0,0.5)" x-show="showModal" :class="{ 'absolute inset-0 z-10 flex items-center justify-center': showModal }">
+    <!--Dialog-->
+    <div    class="bg-white w-9/12 lg:w-6/12  mx-auto rounded shadow-lg py-4 text-left px-6" 
+            x-show="showModal" 
+            @click.away="showModal = false" 
+            x-transition:enter="ease-out duration-300" 
+            x-transition:enter-start="opacity-0 scale-90" 
+            x-transition:enter-end="opacity-100 scale-100" 
+            id="xx">
+
+        <div id="LoanApplicationForm">
+            <!--Title-->
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold">Loan Application Form</p>
+                <div class="cursor-pointer z-50" @click="showModal = false">
+                    <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                        <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="text-xs my-4">
+
+                <p class="font-semibold text-lg mt-4"> Loan Conditions </p>
+                <ol class="list-decimal px-4">
+                    <li> First loan for any member shall be of 1, 00,000 only to be paid in 3 months & second loan going forward can be 1.5 or 2.5 times the member shares depending on meeting the agreed annual target which is reviewed after every 4months. </li>
+                    <li> For any member who has a loan or has guaranteed a loan for another, his/her shares will not be reimbursed (upon termination of membership) until the said loan has been paid back to the group </li>
+                    <li> All loan repayments shall be made through Bank deposits </li>
+                </ol>
+
+                <p class="font-semibold text-lg mt-4"> Loan Terms </p>
+                <ol class="list-decimal px-4">
+                    <li>I understand that, failure to pay back this loan in the period mentioned above without any circumstances agreeable by the group will result to my membership termination in Breakthrough Microfinance.</li>
+                    <li>Two percent (2%) of this loan will serve as insurance in case of death or permanent disability and will be automatically deducted from the loan at the time of disbursement</li>
+                    <li>Transfer fee of TZS 10,000 + VAT (TZS 11,800) will be automatically deducted from the loan at the time of disbursement</li>
+                    <li>I understand and agree to make monthly installments so as to enable other members to take loans. Delays in payments of this monthly installment shall result to a penalty of 10% of the monthly installment due unless there are circumstances that have been communicated to the leadership and extension has been granted</li>
+                </ol>
+
+                <p class="font-semibold text-lg mt-4"> Gurantor </p>
+                <p> I understand that I am required to pay back the loan in case the borrower has failed to return the loan as agreed with no any substantial reasons.</p>
+                
+                <p class="font-semibold text-lg mt-4"> Loan officer/ CFO T1 </p>
+                <p>I certify that all group members have approved for borrower to take this loan and that the guarantors for this loan have reviewed the purpose for the loan and approved it.</p>
+
+
+                <p class="font-semibold text-lg mt-4"> Applicant Information </p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Name </p>
+                        <p class="font-bold"> {{user.first_name}} {{user.last_name}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Phone Number </p>
+                        <p class="font-bold"> {{cur_member.phone_number}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Email Address </p>
+                        <p class="font-bold"> {{user.email}} </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Date of Birth </p>
+                        <p class="font-bold"> {{cur_member.dob}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Identification Number </p>
+                        <p class="font-bold"> {{cur_member.id_type}} : {{cur_member.id_number}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> City </p>
+                        <p class="font-bold"> {{cur_member.city}} </p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-2 my-2 border">
+                    <p class="text-xs"> Address </p>
+                    <p class="font-bold"> {{cur_member.address}} </p>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Account Name </p>
+                        <p class="font-bold"> {{cur_member.account_name}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Account Number </p>
+                        <p class="font-bold"> {{cur_member.account_number}} </p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Bank Name </p>
+                        <p class="font-bold"> {{cur_member.account_bank}} </p>
+                    </div>
+                </div>
+                
+
+                <p class="font-semibold text-lg mt-4"> Loan Information  </p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Accumulated Shares </p>
+                        <p class="font-bold"> {{share.total}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Share Value </p>
+                        <p class="font-bold"> {{ share.value }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Oustanding Loan </p>
+                        <p class="font-bold"> No </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Payment Period </p>
+                        <p class="font-bold" x-text="loan_rate[new_loan.rate]"></p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Insurance </p>
+                        <p class="font-bold" x-text="new_loan.insurance"></p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Transfer Fees </p>
+                        <p class="font-bold"> 2500 </p>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Loan Amount </p>
+                        <p class="font-bold" x-text="new_loan.amount"> </p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Loan Interest </p>
+                        <p class="font-bold" x-text="new_loan.interest"></p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Monthly repayment </p>
+                        <p class="font-bold" x-text="new_loan.repayment"></p>
+                    </div>
+
+                    <div class="bg-gray-50 p-2 border">
+                        <p class=""> Request Date </p>
+                        <p class="font-bold"> {{user.first_name}} {{user.last_name}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> First Installment Dated </p>
+                        <p class="font-bold"> {{user.first_name}} {{user.last_name}}</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 border">
+                        <p class="text-xs"> Disbursed Amount </p>
+                        <p class="font-bold" x-text="new_loan.value">  </p>
+                    </div>
+
+                </div>
+
+
+                <p class="font-semibold text-lg mt-4"> Gurantors of Color Group  </p>
+                {% for member in color_group %}
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-gray-50 p-2 border mt-2">
+                            <p class="text-xs"> Name </p>
+                            <p class="font-bold">{{ member.user.first_name}} {{ member.user.last_name}}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 border mt-2">
+                            <p class="text-xs"> Phone Number </p>
+                            <p class="">{{ member.user.phone_number }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 border mt-2">
+                            <p class="text-xs"> Signature </p>
+                            <p class="">  </p>
+                        </div>
+                    </div>
+                {% endfor %}
+
+
+                <p class="font-semibold text-lg mt-4"> Certification  </p>
+                <p>I CERTIFY THAT EVERYTHING I HAVE STATED IN THIS APPLICATION IS CORRECT. BY SIGNING THIS FORM, I HAVE READ, UNDERSTOOD AND AGREED WITH THE TERMS & CONDITIONS STIPULATED IN THE EUPHORIA CONSTITUTION.</p>
+
+                <p class="font-semibold text-lg mt-4"> Signatures  </p>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div class="bg-gray-50 p-2">
+                        <p class="my-10"></p>
+                        <p class="text-center"> Signature Applicant </p>
+                        <p class="my-10"></p>
+                        <p class="text-center"> Date </p>
+                    </div>
+                    <div class="bg-gray-50 p-2">
+                        <p class="my-10"></p>
+                        <p class="text-center"> Signature of Chairman </p>
+                        <p class="my-10"></p>
+                        <p class="text-center"> Date </p>
+                    </div>
+                    <div class="bg-gray-50 p-2">
+                        <p class="my-10"></p>
+                        <p class="text-center"> Signature of CFO </p>
+                        <p class="my-10"></p>
+                        <p class="text-center"> Date </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <button 
+            class="rounded bg-gray-100 hover:bg-green-600 p-1 px-3 my-3"
+            @click="printDiv('LoanApplicationForm')"> Print Form </button>
+
+
+    </div>
+
+    <!--/Dialog -->
+</div><!-- /Overlay -->
+
+
+{% endblock %}
+
+
+
+{% block get_contents %}
+
+<script src="{% static 'libs/popper/popper.min.js' %}"></script>
+<link href="{% static 'libs/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css">
+<script src="{% static 'libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
+<script src="{% static 'libs/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
+
+<script>
+
+    function getContents() {
+        return {
+            search:                 "",
+            searchMember:           "",
+            sidebarOpen:            false,
+            showLoanApplication:    false,
+            showMember:             false,
+            members:        [],
+
+            file_uploading:         false,
+            memberFiles:            [],
+            memberNotes:            [],
+
+
+            activeMember:    -1,
+            sideScrolled:   true,
+
+            
+            showModal:      false,
+            loadingLoanApplication: false,
+            la_data:        '',
+
+            showAttachments:    false,
+            showNotes:          false,
+            showAll:            true,
+            showData:           false,
+            showColabs:         false,
+
+            new_loan: {
+                amount          : 0,
+                rate            : 1,
+                interest        : 0,
+                insurance       : 0,
+                payout          : 0,
+                payout          : 0,
+                payout          : 0,
+            },
+
+            loan_rate:  {
+                1   : 1,
+                3   : 3,
+                5   : 6,
+                7   : 9,
+                9   : 12,
+                11  : 18,
+            },
+              
+
+            new_event: {
+                location        : "",
+                title           : "",
+                contact_name    : "",
+                description     : "",
+                sector          : "",
+                contact_prof    : "",
+                contact_phone   : "",
+                contact_email   : "",
+                signal          : "",
+                stage           : "",
+                status          : "",
+            },
+
+            cur_event: {
+                id              : "",
+                alert_ref       : "",
+                alert_label     : "",
+                alert_desc      : "",
+                alert_sectors   : "",
+                location        : "",
+                title           : "",
+                contact_name    : "",
+                description     : "",
+                sector          : "",
+                contact_prof    : "",
+                contact_phone   : "",
+                contact_email   : "",
+                signal          : "",
+                stage           : "",
+                status          : "",
+                files           : {},
+            },
+
+            new_link: {
+                title           : "",
+                url             : "",
+                event_id        : "",
+            },
+
+            new_attachment: {
+                event_id        : "",
+                url             : "",    
+            },
+
+            
+
+            uploadFile(){
+
+                console.log('uploading file');
+                this.file_uploading     = true;
+                let formData    = new FormData();
+                let event_id    = this.cur_event.id
+                let afile       = this.$refs.attachment.files[0];      
+                    
+                formData.append("obj", afile);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                formData.append("event_id", event_id);
+
+                var url         = window.location.origin + '/ems/utils/uf'
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    credentials : 'same-origin',
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('upload done');
+
+                    // insert into place
+                    //this.file_uploading     = true;
+
+                    tmp = {
+                        'css_icon': 'mdi mdi-file text-emerald-500 ',
+                        'filename':     '{{user.first_name}} {{user.last_name}}',
+                        'created_on': 'Just now',
+                    }
+
+                    this.Filemembers.unshift(tmp)
+                    console.log('adding file done');
+                    this.file_uploading     = false;
+                
+                })
+                .catch(() => {
+                    
+                    alert('upload error')
+                    console.log('upload error')
+                    //this.file_uploading     = true;
+                })
+                .finally(() => {
+                    this.file_uploading     = false;
+                })
+
+                /*
+                const reader = new FileReader()
+                if (afile.length < 1) {
+                    return
+                }
+                reader.readAsDataURL(afile)
+                reader.onload = () => (this.imageUrl = reader.result)*/
+            },
+
+
+            setMember(e){
+                if(this.cur_member.id != e.id){
+                    this.cur_member = e;
+    
+                    // get Notesconsole.log('adding file');
+                    //this.fetchMemberNotes();
+                    //this.fetchMemberFiles();
+                    //this.fetchEventData();
+
+                }
+
+            },
+
+
+            get filteredMembers() {
+
+
+                if (this.search === "" && !this.memberStatus) {
+                    return this.members;
+                }
+                 
+                return this.members.filter((item) => {
+                    return item.full_name
+                        .toLowerCase()
+                        .includes(this.search.toLowerCase() && (!this.memberStatus || item.status == this.memberStatus)) ;
+                });
+            },
+
+
+            fetchMembers(){
+                this.members = [
+                    {% for member in members %}
+                        {
+                            id              : "{{ member.id }}",
+                            first_name      : "{{ member.user.first_name }}",
+                            last_name       : "{{ member.user.last_name }}",
+                            full_name       : "{{ member.user.first_name }} {{ member.user.last_name }}",
+                            email           : "{{ member.user.email }}",
+                            color           : "{{ member.color }}",
+                        },
+                    {% endfor %}
+                ]
+            },
+
+            hideAllActivities(){
+                this.showAttachments = false;
+                this.showNotes = false;
+                this.showData = false;
+                this.showColabs = false;
+                this.showAll = false;
+            },
+
+            loanApplication(){
+                this.sidebarOpen            = true;
+                this.showLoanApplication    = true;
+            },
+
+            printApplication(){
+                this.showModal       = true;
+            },
+
+        }
+    }
+
+    function printDiv(divID) {
+        var divContents = document.getElementById(divID).innerHTML;
+        var a = window.open('', '', 'height=500, width=500');
+        a.document.write('<html>');
+        a.document.write('<head>');
+        a.document.write('<title>{{user.first_name}} {{user.last_name}}| Breakthrough Loan Application </title>');
+        a.document.write('<script src=\'https://cdn.tailwindcss.com\'><\/script>');
+        a.document.write('</head>');
+        a.document.write('<body> ');
+        a.document.write(divContents);
+        a.document.write('</body></head>');
+        a.document.close();
+        a.print();
+    };
+
+    function initjq() {
+
+        $(".select2").select2();
+        $(".input-mask").inputmask();
+
+        $('.get_colaborator').select2({
+            minimumInputLength: 2,
+            ajax: {
+            url: window.location.origin + '/ems/utils/su',
+            dataType: 'json',
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+            }
+        });
+
+    };
+
+
+</script>
+{% endblock %}

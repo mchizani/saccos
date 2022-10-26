@@ -1,0 +1,104 @@
+[
+{
+    "model": "breakthrough.member",
+    "pk": 6,
+    "fields": {
+        "user": 2,
+        "color": 2,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+},
+{
+    "model": "breakthrough.member",
+    "pk": 7,
+    "fields": {
+        "user": 5,
+        "color": 1,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+},
+{
+    "model": "breakthrough.member",
+    "pk": 8,
+    "fields": {
+        "user": 3,
+        "color": 2,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+},
+{
+    "model": "breakthrough.member",
+    "pk": 9,
+    "fields": {
+        "user": 4,
+        "color": 3,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+},
+{
+    "model": "breakthrough.member",
+    "pk": 10,
+    "fields": {
+        "user": 6,
+        "color": 1,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+},
+{
+    "model": "breakthrough.member",
+    "pk": 11,
+    "fields": {
+        "user": 1,
+        "color": 1,
+        "phone_number": "0700000000",
+        "id_number": "00000000-00000-000000",
+        "id_type": "NIDA",
+        "dob": "1900-01-01",
+        "city": "Dar-es-Salaam",
+        "address": null,
+        "account_bank": "NONE",
+        "account_name": "NONE",
+        "account_number": "000000000"
+    }
+}
+]
