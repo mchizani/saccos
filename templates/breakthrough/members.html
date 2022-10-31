@@ -226,12 +226,12 @@
 
                     <p > Total Repayment </p> 
                     <p  x-text="new_loan.value" 
-                        x-effect="new_loan.value = new_loan.amount - new_loan.insurance - 2500 + new_loan.interest"
+                        x-effect="new_loan.value = new_loan.amount + (new_loan.amount * new_loan.rate / 100)"
                         class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
 
                     <p > Monthly Repayment </p> 
                     <p  x-text="new_loan.repayment" 
-                        x-effect="new_loan.repayment = new_loan.value / loan_rate[new_loan.rate]"
+                        x-effect="new_loan.repayment = (new_loan.amount + (new_loan.amount * new_loan.rate / 100)) / loan_rate[new_loan.rate]"
                         class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
 
                 </div>
@@ -239,7 +239,7 @@
 
                 <button 
                     class="rounded bg-gray-100 hover:bg-emerald-900 hover:text-white p-1 px-3 my-3"
-                    @click="printDiv('LoanApplicationForm')"> Print Loan Application </button>
+                    @click="printDiv('LoanApplicationForm',new_loan.value)"> Print Loan Application </button>
 
             </div>
 
@@ -405,6 +405,7 @@
 
                 <p class="font-semibold text-lg mt-4"> Gurantors of Color Group  </p>
                 {% for member in color_group %}
+                    {% if member.user.id != request.user.id %}
                     <div class="grid grid-cols-3 gap-2">
                         <div class="bg-gray-50 p-2 border mt-2">
                             <p class="text-xs"> Name </p>
@@ -412,13 +413,14 @@
                         </div>
                         <div class="bg-gray-50 p-2 border mt-2">
                             <p class="text-xs"> Phone Number </p>
-                            <p class="">{{ member.user.phone_number }}</p>
+                            <p class="font-bold">{{ member.phone_number }}</p>
                         </div>
                         <div class="bg-gray-50 p-2 border mt-2">
                             <p class="text-xs"> Signature </p>
                             <p class="">  </p>
                         </div>
                     </div>
+                    {% endif %}
                 {% endfor %}
 
 
@@ -450,10 +452,6 @@
 
             </div>
         </div>
-
-        <button 
-            class="rounded bg-gray-100 hover:bg-green-600 p-1 px-3 my-3"
-            @click="printDiv('LoanApplicationForm')"> Print Form </button>
 
 
     </div>
@@ -692,19 +690,19 @@
         }
     }
 
-    function printDiv(divID) {
+    function printDiv(divID, amount) {
         var divContents = document.getElementById(divID).innerHTML;
         var a = window.open('', '', 'height=500, width=500');
         a.document.write('<html>');
         a.document.write('<head>');
-        a.document.write('<title>{{user.first_name}} {{user.last_name}}| Breakthrough Loan Application </title>');
+        a.document.write('<title>{{user.first_name}} {{user.last_name}}| Breakthrough Loan '+amount+' {% now "M-Y" %} </title>');
         a.document.write('<script src=\'https://cdn.tailwindcss.com\'><\/script>');
         a.document.write('</head>');
         a.document.write('<body> ');
         a.document.write(divContents);
         a.document.write('</body></head>');
-        a.document.close();
-        a.print();
+        //a.document.close();
+       // a.print();
     };
 
     function initjq() {
