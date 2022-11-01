@@ -70,7 +70,7 @@
                 </li>
             </template>
         </ul>
-        <p class="p-5"> Create Event + </p>
+        <p class="p-5"> Share Purchase + </p>
     </div>
 
 
@@ -205,34 +205,34 @@
                     <p > Loan Insurance </p> 
                     <p  x-text="new_loan.insurance" 
                         x-effect="new_loan.insurance = new_loan.amount * 2 / 100"
-                        class="oldstyle-nums proportional-nums slashed-zero text-right" ></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right" ></p>
 
                     <p > Transfer fee </p> 
-                    <p class="text-right"> 2500 </p>
+                    <p class="md:text-right"> 2500 </p>
 
                     <p> Interest Rate </p>
                     <p  x-text="new_loan.rate"
-                        class="text-right"></p>
+                        class="md:text-right"></p>
 
                     <p > Loan Interest </p> 
                     <p  x-text="new_loan.interest" 
                         x-effect="new_loan.interest = new_loan.amount * new_loan.rate / 100"
-                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
                     
                     <p > Disbursed Amount </p> 
                     <p  x-text="new_loan.payout" 
                         x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - 2500"
-                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
 
                     <p > Total Repayment </p> 
                     <p  x-text="new_loan.value" 
                         x-effect="new_loan.value = new_loan.amount + (new_loan.amount * new_loan.rate / 100)"
-                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
 
                     <p > Monthly Repayment </p> 
                     <p  x-text="new_loan.repayment" 
                         x-effect="new_loan.repayment = (new_loan.amount + (new_loan.amount * new_loan.rate / 100)) / loan_rate[new_loan.rate]"
-                        class="oldstyle-nums proportional-nums slashed-zero text-right"></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
 
                 </div>
 
