@@ -470,7 +470,7 @@
 <link href="{% static 'libs/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css">
 <script src="{% static 'libs/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
-<script src="{% static 'libs/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="js/jsPDF/dist/jspdf.umd.js"></script>
 
 <script>
 
@@ -702,6 +702,24 @@
         a.document.write(divContents);
         a.document.write('</body></head>');
         //a.document.close();
+
+        window.jsPDF = window.jspdf.jsPDF;
+
+        var doc = new jsPDF();
+            
+        // Source HTMLElement or a string containing HTML.
+        var elementHTML = document.querySelector("#contnet");
+
+        doc.html(elementHTML, {
+            callback: function(doc) {
+                // Save the PDF
+                doc.save('sample-document.pdf');
+            },
+            x: 15,
+            y: 15,
+            width: 170, //target width in the PDF document
+            windowWidth: 650 //window width in CSS pixels
+        });
        // a.print();
     };
 
