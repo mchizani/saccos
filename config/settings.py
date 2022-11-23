@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # apps
     'apps.account.apps.AccountConfig',
     'apps.breakthrough.apps.BreakthroughConfig',
+    #'apps.dEntry.apps.DentryConfig',
 ]
 
 MIDDLEWARE = [

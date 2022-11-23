@@ -181,11 +181,39 @@
                         class="w-full bg-gray-200 text-gray-700 border rounded py-1 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" 
                         id="grid-first-name" 
                         type="number"  
-                        min="300000" max="" 
+                        min="0" max="" 
                         placeholder="Max Amount"
                         value="300000"
                         x-model.number="new_loan.amount">
                 </div>
+                <div class="w-48 px-3 mb-6 md:mb-0>
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-first-name">
+                    Oustanding Loan
+                    </label>
+                    <input 
+                        class="w-full bg-gray-200 text-gray-700 border rounded py-1 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" 
+                        id="grid-first-name" 
+                        type="number"  
+                        min="0" max="" 
+                        placeholder="Oustanding Loan"
+                        value="300000"
+                        x-model.number="new_loan.out_amount">
+                </div>
+
+                <div class="w-48 px-3 mb-6 md:mb-0>
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-first-name">
+                    Accumulated shares
+                    </label>
+                    <input 
+                        class="w-full bg-gray-200 text-gray-700 border rounded py-1 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" 
+                        id="grid-first-name" 
+                        type="number"  
+                        min="0" max="9000" 
+                        placeholder="Shares"
+                        value="500"
+                        x-model.number="new_loan.shares">
+                </div>
+
                 <div class="px-3">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-last-name">
                     Loan Period
@@ -202,35 +230,45 @@
 
             <div class="w-1/2">
                 <div class="grid grid-cols-2 text-sm">
-                    <p > Loan Insurance </p> 
-                    <p  x-text="new_loan.insurance" 
+
+                    <p class="font-extrabold text-xl"> Loan Amounnt </p> 
+                    <p  x-text="addCommas(new_loan.amount)"
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right font-extrabold text-xl" ></p>
+
+                    <p class="italic"> less Loan Insurance </p> 
+                    <p  x-text="addCommas(new_loan.insurance)" 
                         x-effect="new_loan.insurance = new_loan.amount * 2 / 100"
-                        class="oldstyle-nums proportional-nums slashed-zero md:text-right" ></p>
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right italic" ></p>
+                
 
-                    <p > Transfer fee </p> 
-                    <p class="md:text-right"> 2500 </p>
+                    <p class="italic"> less Transfer fee </p> 
+                    <p class="md:text-right italic"> 2,500 </p>
 
-                    <p> Interest Rate </p>
-                    <p  x-text="new_loan.rate"
-                        class="md:text-right"></p>
-
-                    <p > Loan Interest </p> 
-                    <p  x-text="new_loan.interest" 
-                        x-effect="new_loan.interest = new_loan.amount * new_loan.rate / 100"
-                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
+                    <p  class="italic"> less Oustanding Loan </p> 
+                    <p  x-text="addCommas(new_loan.out_amount)"
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right italic"></p>
                     
-                    <p > Disbursed Amount </p> 
-                    <p  x-text="new_loan.payout" 
-                        x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - 2500"
-                        class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
+                    <p class="font-extrabold text-xl"> Disbursed Amount </p> 
+                    <p  x-text="addCommas(new_loan.payout)" 
+                        x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - 2500 - new_loan.out_amount"
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right font-extrabold text-xl"></p>
+
+                    <p class="italic mt-5"> Interest Rate </p>
+                    <p  x-text="new_loan.rate"
+                        class="md:text-right italic mt-5"></p>
+
+                    <p  class="italic"> Interest </p> 
+                    <p  x-text="addCommas(new_loan.interest)" 
+                        x-effect="new_loan.interest = new_loan.amount * new_loan.rate / 100"
+                        class="oldstyle-nums proportional-nums slashed-zero md:text-right italic"></p>
 
                     <p > Total Repayment </p> 
-                    <p  x-text="new_loan.value" 
+                    <p  x-text="addCommas(new_loan.value)" 
                         x-effect="new_loan.value = new_loan.amount + (new_loan.amount * new_loan.rate / 100)"
                         class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
 
                     <p > Monthly Repayment </p> 
-                    <p  x-text="new_loan.repayment" 
+                    <p  x-text="addCommas(new_loan.repayment)" 
                         x-effect="new_loan.repayment = (new_loan.amount + (new_loan.amount * new_loan.rate / 100)) / loan_rate[new_loan.rate]"
                         class="oldstyle-nums proportional-nums slashed-zero md:text-right"></p>
 
@@ -358,7 +396,7 @@
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Oustanding Loan </p>
-                        <p class="font-bold"> No </p>
+                        <p class="font-bold" x-text="addCommas(new_loan.out_amount)"></p>
                     </div>
 
                     <div class="bg-gray-50 p-2 border">
@@ -367,24 +405,24 @@
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Insurance </p>
-                        <p class="font-bold" x-text="new_loan.insurance"></p>
+                        <p class="font-bold" x-text="addCommas(new_loan.insurance)"></p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Transfer Fees </p>
-                        <p class="font-bold"> 2500 </p>
+                        <p class="font-bold"> 2,500 </p>
                     </div>
 
                     <div class="bg-gray-50 p-2 border">
                         <p class=""> Loan Amount </p>
-                        <p class="font-bold" x-text="new_loan.amount"> </p>
+                        <p class="font-bold" x-text="addCommas(new_loan.amount)"> </p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Loan Interest </p>
-                        <p class="font-bold" x-text="new_loan.interest"></p>
+                        <p class="font-bold" x-text="addCommas(new_loan.interest)"></p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Monthly repayment </p>
-                        <p class="font-bold" x-text="new_loan.repayment"></p>
+                        <p class="font-bold" x-text="addCommas(new_loan.repayment)"></p>
                     </div>
 
                     <div class="bg-gray-50 p-2 border">
@@ -397,7 +435,7 @@
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Disbursed Amount </p>
-                        <p class="font-bold" x-text="new_loan.value">  </p>
+                        <p class="font-bold" x-text="addCommas(new_loan.payout)">  </p>
                     </div>
 
                 </div>
@@ -470,7 +508,9 @@
 <link href="{% static 'libs/select2/css/select2.min.css' %}" rel="stylesheet" type="text/css">
 <script src="{% static 'libs/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
-<script src="js/jsPDF/dist/jspdf.umd.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
 
 <script>
 
@@ -504,12 +544,12 @@
 
             new_loan: {
                 amount          : 0,
+                out_amount      : 0,
                 rate            : 1,
                 interest        : 0,
                 insurance       : 0,
                 payout          : 0,
-                payout          : 0,
-                payout          : 0,
+                shares          : 0,
             },
 
             loan_rate:  {
@@ -690,6 +730,19 @@
         }
     }
 
+    function addCommas(nStr){
+
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
     function printDiv(divID, amount) {
         var divContents = document.getElementById(divID).innerHTML;
         var a = window.open('', '', 'height=500, width=500');
@@ -703,14 +756,14 @@
         a.document.write('</body></head>');
         //a.document.close();
 
-        window.jsPDF = window.jspdf.jsPDF;
+        //window.jsPDF = window.jspdf.jsPDF;
 
         var doc = new jsPDF();
             
         // Source HTMLElement or a string containing HTML.
-        var elementHTML = document.querySelector("#contnet");
+        var elementHTML = document.querySelector("#"+divID);
 
-        doc.html(elementHTML, {
+        doc.fromHTML(elementHTML, {
             callback: function(doc) {
                 // Save the PDF
                 doc.save('sample-document.pdf');
@@ -722,6 +775,30 @@
         });
        // a.print();
     };
+
+
+    function getPDF(divID,amount) {
+        var doc = new jsPDF();
+       
+        // We'll make our own renderer to skip this editor
+        var specialElementHandlers = {
+          '#getPDF': function(element, renderer){
+            return true;
+          },
+          '.controls': function(element, renderer){
+            return true;
+          }
+        };
+      
+        // All units are in the set measurement for the document
+        // This can be changed to "pt" (points), "mm" (Default), "cm", "in"
+        doc.fromHTML($('#'+divID).get(0), 15, 15, {
+          'width': 170, 
+          'elementHandlers': specialElementHandlers
+        });
+        var fn = '{{user.first_name}} {{user.last_name}}| Breakthrough Loan '+amount;
+        doc.save(fn);
+      }
 
     function initjq() {
 
