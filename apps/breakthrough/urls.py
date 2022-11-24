@@ -7,4 +7,5 @@ urlpatterns = [
     path("members", MembersView.as_view(), name="members"),
     path("", MembersView.as_view(), name="dashboard"),
     path("reports", MembersView.as_view(), name="reports"),
+    path("profile", ProfileView.as_view(), name="profile"),
 ]

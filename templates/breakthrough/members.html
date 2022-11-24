@@ -388,11 +388,11 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div class="bg-gray-50 p-2 border">
                         <p class=""> Accumulated Shares </p>
-                        <p class="font-bold"> {{share.total}}</p>
+                        <p class="font-bold" x-text="new_loan.shares"> {{share.total}}</p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Share Value </p>
-                        <p class="font-bold"> {{ share.value }}</p>
+                        <p class="font-bold" x-text="addCommas(new_loan.shares * 50000)"> {{ share.value }}</p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Oustanding Loan </p>
@@ -427,11 +427,11 @@
 
                     <div class="bg-gray-50 p-2 border">
                         <p class=""> Request Date </p>
-                        <p class="font-bold"> {{user.first_name}} {{user.last_name}}</p>
+                        <p class="font-bold"> {% now "M. d, Y" %}</p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> First Installment Dated </p>
-                        <p class="font-bold"> {{user.first_name}} {{user.last_name}}</p>
+                        <p class="font-bold"> {{ user|first_installment }}</p>
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Disbursed Amount </p>

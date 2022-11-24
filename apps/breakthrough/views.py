@@ -30,3 +30,13 @@ class MembersView(generic.TemplateView):
         
         
         return context
+    
+
+class ProfileView(generic.TemplateView):
+    template_name       = "breakthrough/profile.html"
+    
+    def get_context_data(self, **kwargs):
+
+        context = super(ProfileView, self).get_context_data(**kwargs)
+        cur_member               = Member.objects.get(user__id=self.request.user.id)
+        context['cur_member']    = cur_member
