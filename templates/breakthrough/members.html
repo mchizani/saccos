@@ -252,7 +252,7 @@
                     
                     <p class="font-extrabold text-xl"> Disbursed Amount </p> 
                     <p  x-text="addCommas(new_loan.payout)" 
-                        x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - 2500 - new_loan.out_amount"
+                        x-effect="new_loan.payout = new_loan.amount - new_loan.insurance - new_loan.trx_fees - new_loan.out_amount"
                         class="oldstyle-nums proportional-nums slashed-zero md:text-right font-extrabold text-xl"></p>
 
                     <p class="italic mt-5"> Interest Rate </p>
