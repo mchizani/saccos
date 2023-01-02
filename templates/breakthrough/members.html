@@ -242,7 +242,9 @@
                 
 
                     <p class="italic"> less Transfer fee </p> 
-                    <p class="md:text-right italic"> 2,500 </p>
+                    <p  class="md:text-right italic" 
+                        x-text="addCommas(new_loan.trx_fees)"
+                        x-effect="new_loan.trx_fees = (new_loan.amount > 20000000) ? 11800 : 2950"></p>
 
                     <p  class="italic"> less Oustanding Loan </p> 
                     <p  x-text="addCommas(new_loan.out_amount)"
@@ -323,7 +325,7 @@
 
                 <p class="font-semibold text-lg mt-4"> Loan Terms </p>
                 <ol class="list-decimal px-4">
-                    <li>I understand that, failure to pay back this loan in the period mentioned above without any circumstances agreeable by the group will result to my membership termination in Breakthrough Microfinance.</li>
+                    <li>I understand that, failure to pay back this loan in the period mentioned above without any circumstances agreeable by the group will result to my membership termination in Breakthrough Community Microfinance LTD.</li>
                     <li>Two percent (2%) of this loan will serve as insurance in case of death or permanent disability and will be automatically deducted from the loan at the time of disbursement</li>
                     <li>Transfer fee of TZS 10,000 + VAT (TZS 11,800) will be automatically deducted from the loan at the time of disbursement</li>
                     <li>I understand and agree to make monthly installments so as to enable other members to take loans. Delays in payments of this monthly installment shall result to a penalty of 10% of the monthly installment due unless there are circumstances that have been communicated to the leadership and extension has been granted</li>
@@ -409,7 +411,7 @@
                     </div>
                     <div class="bg-gray-50 p-2 border">
                         <p class="text-xs"> Transfer Fees </p>
-                        <p class="font-bold"> 2,500 </p>
+                        <p class="font-bold" x-text="addCommas(new_loan.trx_fees)"></p>
                     </div>
 
                     <div class="bg-gray-50 p-2 border">
@@ -550,6 +552,7 @@
                 insurance       : 0,
                 payout          : 0,
                 shares          : 0,
+                trx_fees        : 2950,
             },
 
             loan_rate:  {
